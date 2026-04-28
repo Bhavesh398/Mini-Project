@@ -16,7 +16,8 @@ import { utMarksRouter } from './routes/ut-marks.routes.js';
 import { usersRouter } from './routes/users.routes.js';
 
 const app = express();
-const uploadsDir = path.resolve(process.cwd(), 'uploads');
+const isVercel = !!process.env.VERCEL;
+const uploadsDir = isVercel ? path.join('/tmp', 'uploads') : path.resolve(process.cwd(), 'uploads');
 
 fs.mkdirSync(uploadsDir, { recursive: true });
 
@@ -56,7 +57,13 @@ async function start() {
   });
 }
 
-start().catch((error) => {
-  console.error('Failed to start backend', error);
-  process.exit(1);
-});
+if (!isVercel) {
+  start().catch((error) => {
+    console.error('Failed to start backend', error);
+    process.exit(1);
+  });
+} else {
+  ensureCoreSchema().then(() => ensureMiniProjectSchema()).catch(console.error);
+}
+
+export default app;

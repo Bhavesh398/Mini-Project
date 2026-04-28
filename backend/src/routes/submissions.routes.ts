@@ -59,7 +59,8 @@ const upload = multer({
   }
 });
 
-const uploadsRoot = path.resolve(process.cwd(), 'uploads');
+const isVercel = !!process.env.VERCEL;
+const uploadsRoot = isVercel ? path.join('/tmp', 'uploads') : path.resolve(process.cwd(), 'uploads');
 const submissionUploadsDir = path.join(uploadsRoot, 'submissions');
 
 async function ensureUploadDirectory() {
