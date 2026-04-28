@@ -608,7 +608,6 @@ submissionsRouter.get('/export/submission-status', requireRole('admin', 'teacher
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'AMPLIFY';
     workbook.created = new Date();
-    workbook.properties.title = 'Student Submission Status Report';
 
     const summarySheet = workbook.addWorksheet('Summary');
     summarySheet.columns = [
