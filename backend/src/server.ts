@@ -21,7 +21,11 @@ const uploadsDir = path.resolve(process.cwd(), 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
 
 app.use(helmet());
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+const allowedOrigins = env.CORS_ORIGIN.split(',').map(o => o.trim());
+if (!allowedOrigins.includes('https://mini-project-ten-sand.vercel.app')) {
+  allowedOrigins.push('https://mini-project-ten-sand.vercel.app');
+}
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use('/uploads', express.static(uploadsDir));
 
