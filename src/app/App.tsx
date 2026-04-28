@@ -8,16 +8,21 @@ import { AdminClassesPage } from './pages/admin/ClassesPage';
 import { AdminReportsPage } from './pages/admin/ReportsPage';
 import { AdminSettingsPage } from './pages/admin/SettingsPage';
 import { StudentDashboardPage } from './pages/student/DashboardPage';
-import { LearningPage } from './pages/student/LearningPage';
+import { SubjectsPage } from './pages/student/LearningPage';
+import { StudentCourseSelectionPage } from './pages/student/CourseSelectionPage';
 import { ProjectsPage as StudentProjectsPage } from './pages/student/ProjectsPage';
-import { AssessmentsPage } from './pages/student/AssessmentsPage';
+import { MiniProjectDetailPage } from './pages/student/MiniProjectDetailPage';
 import { QueriesPage } from './pages/student/QueriesPage';
 import { ProfilePage } from './pages/student/ProfilePage';
-import { AdaptiveHomeworkPage } from './pages/student/AdaptiveHomeworkPage';
+import { StudentSubmissionsPage } from './pages/student/SubmissionsPage';
+import { StudentTasksPage } from './pages/student/TasksPage';
 import { TeacherDashboardPage } from './pages/teacher/DashboardPage';
+import { TeacherClassesPage } from './pages/teacher/ClassesPage';
 import { ProjectsPage } from './pages/teacher/ProjectsPage';
 import { ProjectDashboardPage } from './pages/teacher/ProjectDashboardPage';
 import { TeamDetailPage } from './pages/teacher/TeamDetailPage';
+import { TeacherSubmissionsPage } from './pages/teacher/SubmissionsPage';
+import { TeacherTasksPage } from './pages/teacher/TasksPage';
 
 export default function App() {
   return (
@@ -37,16 +42,22 @@ export default function App() {
             
             {/* Teacher Routes */}
             <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+            <Route path="/teacher/classes" element={<TeacherClassesPage />} />
+            <Route path="/teacher/tasks" element={<TeacherTasksPage />} />
             <Route path="/teacher/projects" element={<ProjectsPage />} />
+            <Route path="/teacher/submissions" element={<TeacherSubmissionsPage />} />
             <Route path="/teacher/projects/:projectId" element={<ProjectDashboardPage />} />
             <Route path="/teacher/projects/:projectId/teams/:teamId" element={<TeamDetailPage />} />
             
             {/* Student Routes */}
             <Route path="/student/dashboard" element={<StudentDashboardPage />} />
-            <Route path="/student/learning" element={<LearningPage />} />
-            <Route path="/student/homework" element={<AdaptiveHomeworkPage />} />
+            <Route path="/student/subjects" element={<SubjectsPage />} />
+            <Route path="/student/course-selection" element={<StudentCourseSelectionPage />} />
+            <Route path="/student/learning" element={<Navigate to="/student/subjects" replace />} />
+            <Route path="/student/tasks" element={<StudentTasksPage />} />
+            <Route path="/student/submissions" element={<StudentSubmissionsPage />} />
             <Route path="/student/projects" element={<StudentProjectsPage />} />
-            <Route path="/student/assessments" element={<AssessmentsPage />} />
+            <Route path="/student/projects/:projectId" element={<MiniProjectDetailPage />} />
             <Route path="/student/queries" element={<QueriesPage />} />
             <Route path="/student/profile" element={<ProfilePage />} />
           </Routes>

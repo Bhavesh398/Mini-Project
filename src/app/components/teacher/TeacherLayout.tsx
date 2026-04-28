@@ -2,17 +2,18 @@ import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Settings,
   LogOut,
   Sun,
   Moon,
   ChevronDown,
   Plus,
   Briefcase,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { clearUserSession } from '../../services/auth';
+import { clearUserSession, getUserSession } from '../../services/auth';
 import { ChatBuddy } from '../shared/ChatBuddy';
+import { getTeacherSubjects } from '../../data/subjects';
 
 interface TeacherLayoutProps {
   children: ReactNode;
@@ -20,15 +21,8 @@ interface TeacherLayoutProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/teacher/dashboard', icon: LayoutDashboard },
-  { name: 'Projects', href: '/teacher/projects', icon: Briefcase },
-];
-
-// Sample classes data
-const classesData = [
-  { id: 1, name: 'Mathematics 101' },
-  { id: 2, name: 'Physics Advanced' },
-  { id: 3, name: 'English Literature' },
-  { id: 4, name: 'Chemistry Lab' },
+  { name: 'Mini Projects', href: '/teacher/projects', icon: Briefcase },
+  { name: 'Submissions', href: '/teacher/submissions', icon: FileSpreadsheet },
 ];
 
 export function TeacherLayout({ children }: TeacherLayoutProps) {
@@ -36,6 +30,20 @@ export function TeacherLayout({ children }: TeacherLayoutProps) {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [expandClasses, setExpandClasses] = useState(false);
+  const user = getUserSession();
+  const teacherSubjects = getTeacherSubjects(user?.email);
+
+  const classesData = teacherSubjects.map((subject) => ({
+    id: subject.id,
+    name: subject.displayName,
+  }));
+
+  const userInitials = (user?.name ?? 'Teacher User')
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   const handleLogout = () => {
     clearUserSession();
@@ -93,7 +101,7 @@ export function TeacherLayout({ children }: TeacherLayoutProps) {
                 ))}
                 <button
                   onClick={() => {
-                    navigate('/teacher/dashboard');
+                    navigate('/teacher/classes');
                     setExpandClasses(false);
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs text-indigo-200 hover:bg-white/10 transition-all mt-2 pt-2 border-t border-indigo-400/30"
@@ -164,11 +172,11 @@ export function TeacherLayout({ children }: TeacherLayoutProps) {
             </button>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <div className="text-sm font-medium text-gray-900 dark:text-white">Teacher User</div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white">{user?.name ?? 'Teacher User'}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">Teacher</div>
               </div>
               <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">TU</span>
+                <span className="text-white text-sm font-medium">{userInitials}</span>
               </div>
             </div>
           </div>

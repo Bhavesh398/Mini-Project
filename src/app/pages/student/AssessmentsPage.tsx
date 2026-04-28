@@ -14,30 +14,30 @@ export function AssessmentsPage() {
   const assessments: Assessment[] = [
     {
       id: '1',
-      title: 'Mathematics Quiz 5',
-      subject: 'Mathematics 101',
+      title: 'DBMS Normalization Quiz',
+      subject: 'DBMS (Database Management System)',
       dueDate: 'Jan 10, 2026',
       status: 'graded',
       score: 92
     },
     {
       id: '2',
-      title: 'Physics Midterm',
-      subject: 'Physics Advanced',
+      title: 'Operating Systems Midterm',
+      subject: 'OS (Operating System)',
       dueDate: 'Jan 15, 2026',
       status: 'pending'
     },
     {
       id: '3',
-      title: 'English Essay',
-      subject: 'English Literature',
+      title: 'Design Thinking Case Reflection',
+      subject: 'DT (Design Thinking)',
       dueDate: 'Jan 12, 2026',
       status: 'submitted'
     },
     {
       id: '4',
-      title: 'Chemistry Lab Test',
-      subject: 'Chemistry Lab',
+      title: 'Computational Theory Automata Test',
+      subject: 'CT (Computational Theory)',
       dueDate: 'Jan 18, 2026',
       status: 'pending'
     }

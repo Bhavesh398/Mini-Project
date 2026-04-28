@@ -1,122 +1,82 @@
-import { useState } from 'react';
-import { ChevronLeft, Calendar, Users, TrendingUp, AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, Calendar, GitBranch, Users, Upload, FolderGit2 } from 'lucide-react';
 import { TeacherLayout } from '../../components/teacher/TeacherLayout';
-import { TeamProgressTable, type TeamProgress } from '../../components/pbl/TeamProgressTable';
-import { AttentionPanel, type AttentionItem } from '../../components/pbl/AttentionPanel';
+import { formatRelativeTime, getMiniProjectById, getMiniProjectStudentSummaries } from '../../services/miniProjectStore';
 
 export function ProjectDashboardPage() {
-  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { projectId } = useParams();
+  const [project, setProject] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock project data
-  const project = {
-    id: '1',
-    name: 'Build a Weather App',
-    class: 'Web Development 101',
-    startDate: '2025-12-01',
-    endDate: '2026-01-31',
-    progress: 75,
-    currentMilestone: 'Code Review Phase'
-  };
+  useEffect(() => {
+    let mounted = true;
 
-  // Mock team data
-  const teams: TeamProgress[] = [
-    {
-      id: 't1',
-      name: 'Team Alpha',
-      progress: 85,
-      milestoneStatus: 'on-track',
-      collaboration: 88,
-      lastActivity: '2 hours ago',
-      status: 'active',
-      members: 4
-    },
-    {
-      id: 't2',
-      name: 'Team Beta',
-      progress: 65,
-      milestoneStatus: 'at-risk',
-      collaboration: 62,
-      lastActivity: '1 day ago',
-      status: 'delayed',
-      members: 4
-    },
-    {
-      id: 't3',
-      name: 'Team Gamma',
-      progress: 75,
-      milestoneStatus: 'on-track',
-      collaboration: 91,
-      lastActivity: '30 minutes ago',
-      status: 'active',
-      members: 3
-    },
-    {
-      id: 't4',
-      name: 'Team Delta',
-      progress: 40,
-      milestoneStatus: 'delayed',
-      collaboration: 35,
-      lastActivity: '5 days ago',
-      status: 'inactive',
-      members: 4
+    if (!projectId) {
+      setProject(null);
+      setLoading(false);
+      return;
     }
-  ];
 
-  // Attention items
-  const attentionItems: AttentionItem[] = [
-    {
-      id: 'a1',
-      teamName: 'Team Beta',
-      issue: 'behind-schedule',
-      description: 'Team is 2 days behind on code implementation milestone',
-      severity: 'high',
-      daysOverdue: 2
-    },
-    {
-      id: 'a2',
-      teamName: 'Team Delta',
-      issue: 'inactive-member',
-      description: 'Sarah Chen has not contributed anything in 5 days',
-      severity: 'high',
-      affectedMember: 'Sarah Chen'
-    },
-    {
-      id: 'a3',
-      teamName: 'Team Beta',
-      issue: 'low-collaboration',
-      description: 'Team collaboration score dropped 25% this week',
-      severity: 'medium'
-    }
-  ];
+    getMiniProjectById(projectId)
+      .then((data) => {
+        if (!mounted) return;
+        setProject(data);
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
 
-  const handleViewTeamDetails = (teamId: string) => {
-    setSelectedTeam(teamId);
-    // In real app, navigate to team detail page
-    // navigate(`/teacher/projects/${project.id}/teams/${teamId}`);
-  };
+    return () => {
+      mounted = false;
+    };
+  }, [projectId]);
 
-  const handleMessageTeam = (teamId: string) => {
-    console.log('Message team:', teamId);
-    // Open messaging interface
-  };
+  if (loading) {
+    return (
+      <TeacherLayout>
+        <div className="max-w-4xl mx-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8">
+          <p className="text-gray-600 dark:text-gray-400">Loading mini project...</p>
+        </div>
+      </TeacherLayout>
+    );
+  }
 
-  const handleScheduleCheckIn = (teamId: string) => {
-    console.log('Schedule check-in:', teamId);
-    // Open scheduling dialog
-  };
+  if (!project) {
+    return (
+      <TeacherLayout>
+        <div className="max-w-4xl mx-auto space-y-4">
+          <button
+            onClick={() => navigate('/teacher/projects')}
+            className="flex items-center gap-2 text-blue-600 dark:text-blue-400"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Mini Projects
+          </button>
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mini project not found</h1>
+          </div>
+        </div>
+      </TeacherLayout>
+    );
+  }
 
-  const handleViewDetails = (itemId: string) => {
-    console.log('View details:', itemId);
-    // Navigate to attention item details
-  };
+  const studentSummaries = getMiniProjectStudentSummaries(project);
+  const pushedUpdates = project.activity.filter((item) => item.type === 'push').length;
+  const filesTouched = new Set(project.activity.flatMap((item) => item.files)).size;
 
   return (
     <TeacherLayout>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Back Navigation */}
-        <button className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+        <button
+          onClick={() => navigate('/teacher/projects')}
+          className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+        >
           <ChevronLeft className="w-4 h-4" />
-          Back to Projects
+          Back to Mini Projects
         </button>
 
         {/* Sticky Project Summary */}
@@ -124,7 +84,8 @@ export function ProjectDashboardPage() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{project.name}</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">{project.class}</p>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">{project.subject}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">{project.summary}</p>
             </div>
             <div className="text-right">
               <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{project.progress}%</p>
@@ -142,76 +103,128 @@ export function ProjectDashboardPage() {
                   style={{ width: `${project.progress}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Current Phase: {project.currentMilestone}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Next milestone: {project.nextMilestone}</p>
             </div>
 
             {/* Timeline */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">{project.startDate}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Branch: {project.branch}</span>
               </div>
               <div className="text-gray-400">→</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">{project.endDate}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">Repo status: {project.repoStatus}</div>
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Team Progress Table (spans 2 cols on desktop) */}
-          <div className="lg:col-span-2">
-            <TeamProgressTable teams={teams} onRowClick={handleViewTeamDetails} />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+            <div className="flex items-center gap-3">
+              <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Contributors</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">{studentSummaries.length}</p>
+              </div>
+            </div>
           </div>
-
-          {/* Attention Panel (sidebar on desktop) */}
-          <div>
-            <AttentionPanel
-              items={attentionItems}
-              onMessageTeam={handleMessageTeam}
-              onScheduleCheckIn={handleScheduleCheckIn}
-              onViewDetails={handleViewDetails}
-            />
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+            <div className="flex items-center gap-3">
+              <Upload className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Pushed updates</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">{pushedUpdates}</p>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+            <div className="flex items-center gap-3">
+              <FolderGit2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Files touched</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">{filesTouched}</p>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+            <div className="flex items-center gap-3">
+              <GitBranch className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Active branch</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white">{project.branch}</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Team Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Teams</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">{teams.length}</p>
-              </div>
+        <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-6">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Student contribution view</h2>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              See who committed changes, pushed work, and still has pending tasks.
+            </p>
+
+            <div className="mt-6 space-y-4">
+              {studentSummaries.map((student) => (
+                <div key={student.id} className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{student.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{student.role}</p>
+                      <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">Focus: {student.currentFocus}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
+                      <div className="rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-700/50">
+                        <p className="text-gray-500 dark:text-gray-400">Commits</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{student.commitCount}</p>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-700/50">
+                        <p className="text-gray-500 dark:text-gray-400">Pushes</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{student.pushCount}</p>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-700/50">
+                        <p className="text-gray-500 dark:text-gray-400">Done</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{student.tasksCompleted}</p>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-700/50">
+                        <p className="text-gray-500 dark:text-gray-400">Pending</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{student.tasksPending}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      Last activity: {student.lastActivity ? formatRelativeTime(student.lastActivity) : 'No activity yet'}
+                    </p>
+                    <button
+                      onClick={() => navigate(`/teacher/projects/${project.id}/teams/${student.id}`)}
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                    >
+                      Open student audit
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Avg Collaboration</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">
-                  {Math.round(teams.reduce((acc, t) => acc + t.collaboration, 0) / teams.length)}%
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Attention Needed</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">{attentionItems.length}</p>
-              </div>
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent mini project log</h2>
+            <div className="mt-4 space-y-3">
+              {project.activity.slice(0, 8).map((item) => (
+                <div key={item.id} className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.title}</p>
+                      <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                        {item.studentName} • {item.type.toUpperCase()} • {item.files.length > 0 ? item.files.join(', ') : 'No file list'}
+                      </p>
+                    </div>
+                    <span className="text-xs text-gray-500 dark:text-gray-500">{formatRelativeTime(item.timestamp)}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

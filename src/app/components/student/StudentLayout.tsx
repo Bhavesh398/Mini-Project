@@ -4,13 +4,13 @@ import {
   LayoutDashboard,
   BookOpen,
   FolderOpen,
+  UploadCloud,
   CheckSquare,
   HelpCircle,
   User,
   LogOut,
   Sun,
   Moon,
-  Brain,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { clearUserSession } from '../../services/auth';
@@ -22,10 +22,10 @@ interface StudentLayoutProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/student/dashboard', icon: LayoutDashboard },
-  { name: 'Learning', href: '/student/learning', icon: BookOpen },
-  { name: 'Adaptive Homework', href: '/student/homework', icon: Brain },
-  { name: 'Projects', href: '/student/projects', icon: FolderOpen },
-  { name: 'Assessments', href: '/student/assessments', icon: CheckSquare },
+  { name: 'Subjects', href: '/student/subjects', icon: BookOpen },
+  { name: 'Tasks', href: '/student/tasks', icon: CheckSquare },
+  { name: 'Submissions', href: '/student/submissions', icon: UploadCloud },
+  { name: 'Mini Projects', href: '/student/projects', icon: FolderOpen },
   { name: 'Queries', href: '/student/queries', icon: HelpCircle },
   { name: 'Profile', href: '/student/profile', icon: User },
 ];

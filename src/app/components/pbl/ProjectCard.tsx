@@ -69,8 +69,8 @@ export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
           <p className="text-sm font-medium text-gray-900 dark:text-white">{project.phase}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Teams</p>
-          <p className="text-sm font-medium text-gray-900 dark:text-white">{project.teams} active</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Contributors</p>
+          <p className="text-sm font-medium text-gray-900 dark:text-white">{project.teams} members</p>
         </div>
         <div className="col-span-2">
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Next Milestone</p>
@@ -86,7 +86,7 @@ export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
         onClick={() => onViewProject(project.id)}
         className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
       >
-        View Project
+        View Mini Project
         <ChevronRight className="w-4 h-4" />
       </button>
     </div>

@@ -1,12 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StudentLayout } from '../../components/student/StudentLayout';
 import { BarChart3, CheckCircle, Clock, BookOpen, TrendingUp, AlertCircle } from 'lucide-react';
 import { getUserSession } from '../../services/auth';
+import { getStudentUTSheet, type StudentMarksSheet } from '../../services/utMarks';
 
 export function StudentDashboardPage() {
   const navigate = useNavigate();
   const user = getUserSession();
+  const [studentUTSheet, setStudentUTSheet] = useState<StudentMarksSheet | null>(null);
+  const [loadingMarks, setLoadingMarks] = useState(true);
 
   useEffect(() => {
     if (!user || user.role !== 'student') {
@@ -14,13 +17,77 @@ export function StudentDashboardPage() {
     }
   }, [user, navigate]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    const loadMarks = async () => {
+      if (!user || user.role !== 'student') return;
+
+      try {
+        const sheet = await getStudentUTSheet();
+        if (mounted) {
+          setStudentUTSheet(sheet);
+        }
+      } catch (error) {
+        console.error('Failed to load UT marks for dashboard', error);
+      } finally {
+        if (mounted) {
+          setLoadingMarks(false);
+        }
+      }
+    };
+
+    loadMarks();
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.role]);
+
   if (!user) return null;
+
+  if (loadingMarks || !studentUTSheet) {
+    return (
+      <StudentLayout>
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Welcome back, {user.name?.split(' ')[0] || 'Student'}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">Loading your learning dashboard...</p>
+          </div>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  const allSubjectMarks = Object.values(studentUTSheet.marksBySubject);
+  const examinationMark = allSubjectMarks.length
+    ? Math.round(allSubjectMarks.reduce((sum, mark) => sum + mark, 0) / allSubjectMarks.length)
+    : 0;
 
   // Mock data
   const courseValidation = [
-    { id: 1, name: 'Presentation', current: 6, total: 20, icon: '📊', color: 'from-blue-500 to-blue-600' },
-    { id: 2, name: 'Examination', current: 15, total: 20, icon: '📝', color: 'from-orange-500 to-orange-600' },
-    { id: 3, name: 'Reports', current: 10, total: 15, icon: '📄', color: 'from-green-500 to-green-600' }
+    {
+      id: 1,
+      name: 'Examination',
+      current: examinationMark,
+      total: 20,
+      icon: '📝',
+      color: 'from-orange-500 to-orange-600',
+      href: '/student/course-selection',
+      ctaLabel: 'View UT Marks'
+    },
+    {
+      id: 2,
+      name: 'Subjects',
+      current: 7,
+      total: 7,
+      icon: '📄',
+      color: 'from-green-500 to-green-600',
+      href: '/student/subjects',
+      ctaLabel: 'View Subjects'
+    }
   ];
 
   const activityData = [
@@ -34,23 +101,31 @@ export function StudentDashboardPage() {
   ];
 
   const weakestTopics = [
-    { id: 1, name: 'Food safety', score: 75 },
-    { id: 2, name: 'Compliance basics', score: 58 },
-    { id: 3, name: 'Company networking', score: 36 }
+    { id: 1, name: 'DBMS', score: 75 },
+    { id: 2, name: 'OS', score: 58 },
+    { id: 3, name: 'MDM', score: 36 }
   ];
 
   const strongestTopics = [
-    { id: 1, name: 'Cyber security basics', score: 92 },
-    { id: 2, name: 'Covid protocols', score: 95 },
-    { id: 3, name: 'Social media policies', score: 89 }
+    { id: 1, name: 'OE', score: 92 },
+    { id: 2, name: 'CT', score: 95 },
+    { id: 3, name: 'DBMS', score: 89 }
   ];
 
   const courses = [
-    { id: 1, name: 'Conduct UX Research and Test Early Concepts', progress: [20, 60, 75], image: '🎨' },
-    { id: 2, name: 'Designing a Low Fidelity Prototype', progress: [45, 65, 85], image: '🖼️' }
+    { id: 1, name: 'DBMS', progress: [20, 60, 75], image: '🗄️' },
+    { id: 2, name: 'OS', progress: [45, 65, 85], image: '💻' },
+    { id: 3, name: 'MDM', progress: [30, 55, 70], image: '🌐' },
+    { id: 4, name: 'OE', progress: [40, 68, 80], image: '📚' },
+    { id: 5, name: 'CT', progress: [35, 62, 88], image: '🧠' }
   ];
 
   const maxActivity = Math.max(...activityData.flatMap(d => [d.theory, d.practice]));
+
+  const handleCourseValidationClick = (href?: string) => {
+    if (!href) return;
+    navigate(href);
+  };
 
   return (
     <StudentLayout>
@@ -66,9 +141,13 @@ export function StudentDashboardPage() {
         {/* Course Validation Cards */}
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Course Validation</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {courseValidation.map((course) => (
-              <div key={course.id} className={`bg-gradient-to-br ${course.color} rounded-xl p-6 text-white shadow-lg transition-transform hover:shadow-xl`}>
+              <button
+                key={course.id}
+                onClick={() => handleCourseValidationClick(course.href)}
+                className={`text-left bg-gradient-to-br ${course.color} rounded-xl p-6 text-white shadow-lg transition-transform hover:shadow-xl hover:-translate-y-0.5`}
+              >
                 <div className="flex items-start justify-between mb-4">
                   <span className="text-4xl">{course.icon}</span>
                   <span className="text-sm font-semibold opacity-90">{Math.round((course.current / course.total) * 100)}%</span>
@@ -81,7 +160,10 @@ export function StudentDashboardPage() {
                   />
                 </div>
                 <p className="text-sm opacity-90">{course.current}/{course.total}</p>
-              </div>
+                <span className="inline-flex mt-4 px-3 py-1.5 rounded-md bg-white/20 hover:bg-white/25 text-sm font-semibold">
+                  {course.ctaLabel}
+                </span>
+              </button>
             ))}
           </div>
         </div>

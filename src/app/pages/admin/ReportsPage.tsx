@@ -1,6 +1,7 @@
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Button } from '../../components/ui/button';
 import { Download, TrendingUp, TrendingDown } from 'lucide-react';
+import { SUBJECTS } from '../../data/subjects';
 
 const engagementData = [
   { month: 'Sep', engagement: 72 },
@@ -11,11 +12,11 @@ const engagementData = [
 ];
 
 const masteryData = [
-  { subject: 'Mathematics', avgMastery: 82, trend: '+5%' },
-  { subject: 'Computer Science', avgMastery: 78, trend: '+3%' },
-  { subject: 'Physics', avgMastery: 74, trend: '-2%' },
-  { subject: 'Chemistry', avgMastery: 76, trend: '+4%' },
-  { subject: 'Biology', avgMastery: 80, trend: '+6%' },
+  { subject: SUBJECTS[0].displayName, avgMastery: 82, trend: '+5%' },
+  { subject: SUBJECTS[1].displayName, avgMastery: 78, trend: '+3%' },
+  { subject: SUBJECTS[2].displayName, avgMastery: 74, trend: '-2%' },
+  { subject: SUBJECTS[3].displayName, avgMastery: 76, trend: '+4%' },
+  { subject: SUBJECTS[4].displayName, avgMastery: 80, trend: '+6%' },
 ];
 
 const teacherAdoption = [

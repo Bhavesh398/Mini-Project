@@ -1,10 +1,3 @@
-// Mock database of users with roles
-const mockUsers = [
-  { email: 'admin@institution.edu', password: 'admin123', role: 'admin', name: 'Admin User' },
-  { email: 'teacher@institution.edu', password: 'teacher123', role: 'teacher', name: 'Amit Singh' },
-  { email: 'student@institution.edu', password: 'student123', role: 'student', name: 'Isha Nair' },
-];
-
 export type UserRole = 'admin' | 'teacher' | 'student';
 
 export interface User {
@@ -19,28 +12,58 @@ export interface AuthResponse {
   error?: string;
 }
 
-// Simulate authentication with database lookup
+const API_BASE_URL = (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:4000';
+
+interface LoginApiResponse {
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+    role: UserRole;
+  };
+  accessToken: string;
+  refreshToken: string;
+}
+
+// Authenticate against backend API
 export async function authenticate(email: string, password: string): Promise<AuthResponse> {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: normalizedEmail, password })
+    });
 
-  const user = mockUsers.find(u => u.email === email && u.password === password);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        error: errorData.message || 'Invalid email or password'
+      };
+    }
 
-  if (!user) {
+    const data = (await response.json()) as LoginApiResponse;
+
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+
+    return {
+      success: true,
+      user: {
+        email: data.user.email,
+        role: data.user.role,
+        name: data.user.fullName
+      }
+    };
+  } catch {
     return {
       success: false,
-      error: 'Invalid email or password',
+      error: 'Unable to reach backend. Check if server is running.'
     };
   }
-
-  return {
-    success: true,
-    user: {
-      email: user.email,
-      role: user.role,
-      name: user.name,
-    },
-  };
 }
 
 // Get dashboard route based on role
@@ -71,4 +94,10 @@ export function getUserSession(): User | null {
 // Clear user session
 export function clearUserSession(): void {
   localStorage.removeItem('user');
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+}
+
+export function getAccessToken(): string | null {
+  return localStorage.getItem('accessToken');
 }

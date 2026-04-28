@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StudentLayout } from '../../components/student/StudentLayout';
 import { Send, Check, Clock, MessageCircle } from 'lucide-react';
+import { SUBJECT_DISPLAY_NAMES } from '../../data/subjects';
 
 interface Query {
   id: string;
@@ -19,39 +20,39 @@ export function QueriesPage() {
   const queries: Query[] = [
     {
       id: '1',
-      title: 'How do I approach quadratic equations with complex roots?',
-      subject: 'Mathematics 101',
+      title: 'How do I normalize tables up to 3NF correctly?',
+      subject: 'DBMS (Database Management System)',
       postedDate: 'Jan 5, 2026',
       status: 'answered',
-      lastResponse: 'Check the learning materials on complex numbers. Your teacher replied to your query.'
+      lastResponse: 'Check the normalization examples and ER-to-relational mapping notes shared by your teacher.'
     },
     {
       id: '2',
-      title: 'Can you clarify the concept of wave interference?',
-      subject: 'Physics Advanced',
+      title: 'Can you explain the difference between a process and a thread?',
+      subject: 'OS (Operating System)',
       postedDate: 'Jan 7, 2026',
       status: 'pending',
       lastResponse: undefined
     },
     {
       id: '3',
-      title: "Shakespeare's use of metaphor in Hamlet",
-      subject: 'English Literature',
+      title: 'What topic is suitable for my multidisciplinary minor reflection?',
+      subject: 'MDM (Multidisciplinary Minor)',
       postedDate: 'Jan 4, 2026',
       status: 'resolved',
-      lastResponse: 'Your teacher provided detailed feedback on the essay.'
+      lastResponse: 'Your teacher suggested connecting your reflection to a real community problem and your core branch.'
     },
     {
       id: '4',
-      title: 'Safe handling procedures for reactive chemicals',
-      subject: 'Chemistry Lab',
+      title: 'How do I structure the empathy and ideation stages for my case study?',
+      subject: 'DT (Design Thinking)',
       postedDate: 'Jan 6, 2026',
       status: 'answered',
-      lastResponse: 'AI Assistant provided guidance based on lab safety protocols.'
+      lastResponse: 'AI Assistant suggested using user personas, pain points, and a simple ideation matrix.'
     }
   ];
 
-  const subjects = ['Mathematics 101', 'Physics Advanced', 'English Literature', 'Chemistry Lab'];
+  const subjects = SUBJECT_DISPLAY_NAMES;
 
   const getStatusIcon = (status: string) => {
     switch (status) {

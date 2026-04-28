@@ -1,20 +1,22 @@
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Button } from '../../components/ui/button';
 import { Plus, Users, BookOpen } from 'lucide-react';
+import { SUBJECTS } from '../../data/subjects';
 
 const departments = [
-  { name: 'Computer Science', teachers: 8, students: 312, classes: 24 },
-  { name: 'Mathematics', teachers: 12, students: 428, classes: 32 },
-  { name: 'Physics', teachers: 6, students: 186, classes: 15 },
-  { name: 'Chemistry', teachers: 7, students: 198, classes: 18 },
-  { name: 'Biology', teachers: 9, students: 124, classes: 12 },
+  { name: SUBJECTS[0].displayName, teachers: 8, students: 312, classes: 24 },
+  { name: SUBJECTS[1].displayName, teachers: 12, students: 428, classes: 32 },
+  { name: SUBJECTS[2].displayName, teachers: 6, students: 186, classes: 15 },
+  { name: SUBJECTS[3].displayName, teachers: 7, students: 198, classes: 18 },
+  { name: SUBJECTS[4].displayName, teachers: 9, students: 124, classes: 12 },
 ];
 
 const mockClasses = [
-  { id: 'CS-101-A', name: 'Intro to Programming', department: 'Computer Science', teacher: 'Prof. Arjun Patel', students: 32, schedule: 'MWF 9:00-10:30' },
-  { id: 'MATH-201-B', name: 'Calculus II', department: 'Mathematics', teacher: 'Dr. Priya Sharma', students: 28, schedule: 'TTh 10:00-11:30' },
-  { id: 'PHY-101-A', name: 'Physics I', department: 'Physics', teacher: 'Dr. Kavya Reddy', students: 30, schedule: 'MWF 13:00-14:30' },
-  { id: 'CHEM-101-A', name: 'General Chemistry', department: 'Chemistry', teacher: 'Prof. Rajesh Kumar', students: 26, schedule: 'TTh 14:00-15:30' },
+  { id: 'DBMS-101-A', name: 'Relational Database Fundamentals', department: SUBJECTS[0].displayName, teacher: 'Prof. Arjun Patel', students: 32, schedule: 'MWF 9:00-10:30' },
+  { id: 'OS-201-B', name: 'Operating System Concepts', department: SUBJECTS[1].displayName, teacher: 'Dr. Priya Sharma', students: 28, schedule: 'TTh 10:00-11:30' },
+  { id: 'MDM-101-A', name: 'Interdisciplinary Exploration', department: SUBJECTS[2].displayName, teacher: 'Dr. Kavya Reddy', students: 30, schedule: 'MWF 13:00-14:30' },
+  { id: 'DT-101-A', name: 'Human-Centered Design Studio', department: SUBJECTS[3].displayName, teacher: 'Prof. Rajesh Kumar', students: 26, schedule: 'TTh 14:00-15:30' },
+  { id: 'CT-301-A', name: 'Automata and Formal Languages', department: SUBJECTS[4].displayName, teacher: 'Dr. Meera Iyer', students: 24, schedule: 'Fri 10:00-12:00' },
 ];
 
 export function AdminClassesPage() {

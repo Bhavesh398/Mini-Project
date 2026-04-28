@@ -1,3 +1,56 @@
+node_modules/
+**/node_modules/
+dist/
+build/
+/.turbo/
+.parcel-cache/
+.next/
+.vite/
+.cache/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.idea/
+.vscode/
+.history/
+/.pnp/
+/.pnp.js
+uploads/
+uploads/**
+public/uploads/
+*.log
+*.tgz
+dist-*
+/*.zip
+/*.tar.gz
+coverage/
+/.cache/
+*.local
+!.gitignore
+
+# TypeScript
+*.tsbuildinfo
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Misc
+.envrc
+/.eslintcache
+/.prettiercache
 # dependencies
 node_modules/
 
