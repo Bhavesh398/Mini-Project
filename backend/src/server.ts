@@ -23,10 +23,16 @@ fs.mkdirSync(uploadsDir, { recursive: true });
 
 app.use(helmet());
 const allowedOrigins = env.CORS_ORIGIN.split(',').map(o => o.trim());
-if (!allowedOrigins.includes('https://mini-project-ten-sand.vercel.app')) {
-  allowedOrigins.push('https://mini-project-ten-sand.vercel.app');
-}
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static(uploadsDir));
 
